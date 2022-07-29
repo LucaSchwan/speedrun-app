@@ -82,7 +82,7 @@ export default class UserController {
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
-        message: 'Error create User',
+        message: 'Error creating User',
         status: 400,
         innerError: e,
       });
