@@ -96,11 +96,11 @@ export default class SpeedrunTypesController {
       });
     }
 
+    const type = new SpeedrunType();
+    type.name = request.body.name;
+    type.description = request.body.description;
+    type.group = group;
     try {
-      const type = new SpeedrunType();
-      type.name = request.body.name;
-      type.description = request.body.description;
-      type.group = group;
       const result = await this.speedrunTypeRepository.save(type);
       return Result.fromResult(result);
     } catch (e) {
@@ -138,7 +138,6 @@ export default class SpeedrunTypesController {
 
     type.name = request.body.name ?? type.name;
     type.description = request.body.description ?? type.description;
-
     try {
       const result = await this.speedrunTypeRepository.save(type);
       return Result.fromResult(result);
