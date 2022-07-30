@@ -11,7 +11,7 @@ export const AppDataSource = new DataSource({
   database: 'speedrun',
   synchronize: true,
   logging: false,
-  entities: ['src/entities/*.ts'],
+  entities: ['src/entities/**/*.ts'],
   migrations: [],
   subscribers: [],
 });
