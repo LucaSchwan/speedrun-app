@@ -107,7 +107,6 @@ export default class SpeedrunCategoriesController {
 
     category.name = request.body.name ?? category.name;
     category.description = request.body.description ?? category.description;
-
     try {
       const result = await this.speedrunCategoryRepository.save(category);
       return Result.fromResult(result);

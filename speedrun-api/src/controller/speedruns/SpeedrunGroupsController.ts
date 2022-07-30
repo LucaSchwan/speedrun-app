@@ -97,11 +97,11 @@ export default class SpeedrunGroupsController {
       });
     }
 
+    const group = new SpeedrunGroup();
+    group.name = request.body.name;
+    group.description = request.body.description;
+    group.category = category;
     try {
-      const group = new SpeedrunGroup();
-      group.name = request.body.name;
-      group.description = request.body.description;
-      group.category = category;
       const result = await this.speedrunGroupRepository.save(group);
       return Result.fromResult(result);
     } catch (e) {

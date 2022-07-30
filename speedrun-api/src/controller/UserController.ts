@@ -107,7 +107,6 @@ export default class UserController {
     user.email = request.body.email ?? user.email;
     user.name = request.body.name ?? user.name;
     user.passwordHash = request.body.passwordHash ?? user.passwordHash;
-
     try {
       const result = await this.userRepository.save(user);
       return Result.fromResult(result);
