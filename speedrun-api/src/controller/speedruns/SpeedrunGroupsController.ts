@@ -51,7 +51,9 @@ export default class SpeedrunGroupsController {
     response: Response,
     next: NextFunction
   ): Promise<Result<SpeedrunGroup[]>> {
-    const groups = await this.speedrunGroupRepository.find();
+    const groups = await this.speedrunGroupRepository.find({
+      relations: ['category'],
+    });
     return groups == null
       ? Result.fromError({
           message: 'Error getting Speedrun-Groups',
@@ -65,8 +67,11 @@ export default class SpeedrunGroupsController {
     response: Response,
     next: NextFunction
   ): Promise<Result<SpeedrunGroup>> {
-    const group = await this.speedrunGroupRepository.findOneBy({
-      id: Number(request.params.id),
+    const group = await this.speedrunGroupRepository.findOne({
+      where: {
+        id: Number(request.params.id),
+      },
+      relations: ['category'],
     });
     return group == null
       ? Result.fromError({
