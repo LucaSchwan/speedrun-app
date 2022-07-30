@@ -50,7 +50,7 @@ export default class UserController {
     const user = await this.userRepository.find();
     return user == null
       ? Result.fromError({
-          message: 'No Users found',
+          message: 'Error getting Users',
           status: 404,
         })
       : Result.fromResult(user);

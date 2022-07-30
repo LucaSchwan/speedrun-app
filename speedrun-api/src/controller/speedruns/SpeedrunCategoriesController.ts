@@ -51,7 +51,7 @@ export default class SpeedrunCategoriesController {
     const categories = await this.speedrunCategoryRepository.find();
     return categories == null
       ? Result.fromError({
-          message: 'No Speedrun-Categories found',
+          message: 'Error getting Speedrun-Categories',
           status: 404,
         })
       : Result.fromResult(categories);
