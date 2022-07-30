@@ -50,7 +50,7 @@ export default class UserController {
     const user = await this.userRepository.find();
     return user == null
       ? Result.fromError({
-          message: 'Error getting Users',
+          message: 'No Users found',
           status: 404,
         })
       : Result.fromResult(user);
@@ -140,7 +140,8 @@ export default class UserController {
     } catch (e) {
       return Result.fromError({
         message: 'User could not be removed',
-        status: 500,
+        status: 400,
+        innerError: e,
       });
     }
   }

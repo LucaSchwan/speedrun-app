@@ -87,7 +87,7 @@ export default class SpeedrunGroupsController {
 
     if (category == null) {
       return Result.fromError({
-        message: "The Speedrun-Group doesn't exist",
+        message: "The Speedrun-Category doesn't exist",
         status: 400,
       });
     }
@@ -170,7 +170,7 @@ export default class SpeedrunGroupsController {
     } catch (e) {
       return Result.fromError({
         message: 'Speedrun-Group could not be removed',
-        status: 500,
+        status: 400,
         innerError: e,
       });
     }
