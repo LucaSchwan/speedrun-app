@@ -127,7 +127,7 @@ export default class SpeedrunTypesController {
       });
     }
 
-    const { categoryId: groupId } = request.body;
+    const { groupId } = request.body;
     let group: SpeedrunGroup;
     if (groupId !== null) {
       group = await this.speedrunGroupRepository.findOneBy({
