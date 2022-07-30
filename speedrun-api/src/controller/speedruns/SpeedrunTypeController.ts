@@ -50,15 +50,15 @@ export default class SpeedrunTypesController {
     response: Response,
     next: NextFunction
   ): Promise<Result<SpeedrunType[]>> {
-    const type = await this.speedrunTypeRepository.find({
+    const types = await this.speedrunTypeRepository.find({
       relations: ['group'],
     });
-    return type == null
+    return types == null
       ? Result.fromError({
           message: 'Error getting Speedrun-Types',
           status: 404,
         })
-      : Result.fromResult(type);
+      : Result.fromResult(types);
   }
 
   async one(
