@@ -48,13 +48,13 @@ export default class SpeedrunCategoriesController {
     response: Response,
     next: NextFunction
   ): Promise<Result<SpeedrunCategory[]>> {
-    const user = await this.speedrunCategoryRepository.find();
-    return user == null
+    const categories = await this.speedrunCategoryRepository.find();
+    return categories == null
       ? Result.fromError({
           message: 'No Speedrun-Categories found',
           status: 404,
         })
-      : Result.fromResult(user);
+      : Result.fromResult(categories);
   }
 
   async one(
@@ -62,15 +62,15 @@ export default class SpeedrunCategoriesController {
     response: Response,
     next: NextFunction
   ): Promise<Result<SpeedrunCategory>> {
-    const user = await this.speedrunCategoryRepository.findOneBy({
+    const category = await this.speedrunCategoryRepository.findOneBy({
       id: Number(request.params.id),
     });
-    return user == null
+    return category == null
       ? Result.fromError({
           message: 'Speedrun-Category not found',
           status: 404,
         })
-      : Result.fromResult(user);
+      : Result.fromResult(category);
   }
 
   async create(
@@ -95,21 +95,21 @@ export default class SpeedrunCategoriesController {
     response: Response,
     next: NextFunction
   ): Promise<Result<SpeedrunCategory>> {
-    const user = await this.speedrunCategoryRepository.findOneBy({
+    const category = await this.speedrunCategoryRepository.findOneBy({
       id: Number(request.params.id),
     });
-    if (user == null) {
+    if (category == null) {
       return Result.fromError({
         message: 'Speedrun-Category to update not found',
         status: 404,
       });
     }
 
-    user.name = request.body.name ?? user.name;
-    user.description = request.body.description ?? user.description;
+    category.name = request.body.name ?? category.name;
+    category.description = request.body.description ?? category.description;
 
     try {
-      const result = await this.speedrunCategoryRepository.save(user);
+      const result = await this.speedrunCategoryRepository.save(category);
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
@@ -125,18 +125,17 @@ export default class SpeedrunCategoriesController {
     response: Response,
     next: NextFunction
   ): Promise<Result<any>> {
-    const speedrunCategoryToRemove =
-      await this.speedrunCategoryRepository.findOneBy({
-        id: Number(request.params.id),
-      });
-    if (speedrunCategoryToRemove == null) {
+    const categoryToRemove = await this.speedrunCategoryRepository.findOneBy({
+      id: Number(request.params.id),
+    });
+    if (categoryToRemove == null) {
       return Result.fromError({
         message: 'Speedrun-Category to delete was not found',
         status: 404,
       });
     }
     try {
-      await this.speedrunCategoryRepository.remove(speedrunCategoryToRemove);
+      await this.speedrunCategoryRepository.remove(categoryToRemove);
       return Result.fromResult({
         message: 'Speedrun-Category succesfully removed',
       });
