@@ -171,6 +171,7 @@ export default class SpeedrunGroupsController {
       return Result.fromError({
         message: 'Speedrun-Group could not be removed',
         status: 500,
+        innerError: e,
       });
     }
   }

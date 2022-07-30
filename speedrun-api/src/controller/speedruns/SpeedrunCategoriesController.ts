@@ -143,6 +143,7 @@ export default class SpeedrunCategoriesController {
       return Result.fromError({
         message: 'Speedrun-Category could not be removed',
         status: 500,
+        innerError: e,
       });
     }
   }
