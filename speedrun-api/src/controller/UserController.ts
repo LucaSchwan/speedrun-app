@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
+import * as crypto from 'crypto';
 import User from '../entities/User';
 import { AppDataSource } from '../data-source';
 import Result from '../helper/Result';
@@ -77,6 +78,13 @@ export default class UserController {
     response: Response,
     next: NextFunction
   ): Promise<Result<User>> {
+    const user = new User();
+    user.email = request.body.email;
+    user.name = request.body.name;
+
+    const passwordHash = crypto.createHash('sha256');
+    passwordHash.update(request.body.password);
+    user.passwordHash = passwordHash.digest('hex');
     try {
       const result = await this.userRepository.save(request.body);
       return Result.fromResult(result);
@@ -106,7 +114,10 @@ export default class UserController {
 
     user.email = request.body.email ?? user.email;
     user.name = request.body.name ?? user.name;
-    user.passwordHash = request.body.passwordHash ?? user.passwordHash;
+
+    const passwordHash = crypto.createHash('sha256');
+    passwordHash.update(request.body.password);
+    user.passwordHash = passwordHash.digest('hex');
     try {
       const result = await this.userRepository.save(user);
       return Result.fromResult(result);
