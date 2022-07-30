@@ -1,5 +1,5 @@
 import UserController from './controller/UserController';
-import SpeedrunCategoriesController from './controller/speedruns/SpeedrunCategories';
+import SpeedrunCategoriesController from './controller/speedruns/SpeedrunCategoriesController';
 
 const Routes = [
   ...UserController.routes,
