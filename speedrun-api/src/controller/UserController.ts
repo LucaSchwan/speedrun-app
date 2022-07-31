@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
-import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 import User from '../entities/User';
 import { AppDataSource } from '../data-source';
 import Result from '../helper/Result';
@@ -78,16 +78,31 @@ export default class UserController {
     response: Response,
     next: NextFunction
   ): Promise<Result<User>> {
+    const userMaybe = await this.userRepository.findOneBy([
+      {
+        email: request.body.email,
+      },
+      {
+        name: request.body.name,
+      },
+    ]);
+    if (userMaybe != null)
+      return Result.fromError({
+        message: 'User already exists',
+        status: 400,
+      });
+
     const user = new User();
     user.email = request.body.email;
     user.name = request.body.name;
+    user.passwordHash = bcrypt.hashSync(
+      request.body.password,
+      bcrypt.genSaltSync(10)
+    );
 
-    const passwordHash = crypto.createHash('sha256');
-    passwordHash.update(request.body.password);
-    user.passwordHash = passwordHash.digest('hex');
     try {
-      const result = await this.userRepository.save(request.body);
-      return Result.fromResult(result);
+      await this.userRepository.save(user);
+      return Result.fromResult(user);
     } catch (e) {
       return Result.fromError({
         message: 'Error creating User',
@@ -114,10 +129,11 @@ export default class UserController {
 
     user.email = request.body.email ?? user.email;
     user.name = request.body.name ?? user.name;
+    user.passwordHash = bcrypt.hashSync(
+      request.body.password,
+      bcrypt.genSaltSync(10)
+    );
 
-    const passwordHash = crypto.createHash('sha256');
-    passwordHash.update(request.body.password);
-    user.passwordHash = passwordHash.digest('hex');
     try {
       const result = await this.userRepository.save(user);
       return Result.fromResult(result);
