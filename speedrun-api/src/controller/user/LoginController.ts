@@ -43,7 +43,7 @@ export default class LoginController {
     response: Response,
     next: NextFunction
   ): Promise<Result<UserSession[]>> {
-    const { email, name, password } = request.body;
+    const { email, name, password, stayLoggedIn } = request.body;
     let user = await this.userRepository.findOneBy({ name });
     if (user == null) user = await this.userRepository.findOneBy({ email });
     if (user == null) {
@@ -63,7 +63,7 @@ export default class LoginController {
 
     const sessionMaybe = await this.userSessionService.create(
       user,
-      request.body.stayLoggedIn
+      stayLoggedIn
     );
     if (sessionMaybe.error) {
       return Result.fromError(sessionMaybe.error);

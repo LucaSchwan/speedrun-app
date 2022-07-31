@@ -102,6 +102,7 @@ export default class SpeedrunGroupsController {
     group.name = name;
     group.description = description;
     group.category = category;
+
     try {
       const result = await this.speedrunGroupRepository.save(group);
       return Result.fromResult(result);
@@ -119,6 +120,7 @@ export default class SpeedrunGroupsController {
     response: Response,
     next: NextFunction
   ): Promise<Result<SpeedrunGroup>> {
+    const { name, description, categoryId } = request.body;
     const group = await this.speedrunGroupRepository.findOneBy({
       id: Number(request.params.id),
     });
@@ -129,17 +131,16 @@ export default class SpeedrunGroupsController {
       });
     }
 
-    const { categoryId } = request.body;
     let category: SpeedrunCategory;
     if (categoryId !== null) {
       category = await this.speedrunCategoryRepository.findOneBy({
         id: categoryId,
       });
-      group.category = category;
     }
 
     group.name = request.body.name ?? group.name;
     group.description = request.body.description ?? group.description;
+    group.category = category;
 
     try {
       const result = await this.speedrunGroupRepository.save(group);

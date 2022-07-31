@@ -85,8 +85,9 @@ export default class SpeedrunTypesController {
     response: Response,
     next: NextFunction
   ): Promise<Result<SpeedrunType>> {
+    const { groupId, name, description } = request.body;
     const group = await this.speedrunGroupRepository.findOneBy({
-      id: request.body.groupId,
+      id: groupId,
     });
 
     if (group == null) {
@@ -97,9 +98,10 @@ export default class SpeedrunTypesController {
     }
 
     const type = new SpeedrunType();
-    type.name = request.body.name;
-    type.description = request.body.description;
+    type.name = name;
+    type.description = description;
     type.group = group;
+
     try {
       const result = await this.speedrunTypeRepository.save(type);
       return Result.fromResult(result);
@@ -117,6 +119,7 @@ export default class SpeedrunTypesController {
     response: Response,
     next: NextFunction
   ): Promise<Result<SpeedrunType>> {
+    const { name, description, groupId } = request.body;
     const type = await this.speedrunTypeRepository.findOneBy({
       id: Number(request.params.id),
     });
@@ -127,17 +130,17 @@ export default class SpeedrunTypesController {
       });
     }
 
-    const { groupId } = request.body;
     let group: SpeedrunGroup;
     if (groupId !== null) {
       group = await this.speedrunGroupRepository.findOneBy({
         id: groupId,
       });
-      type.group = group;
     }
 
     type.name = request.body.name ?? type.name;
     type.description = request.body.description ?? type.description;
+    type.group = group;
+
     try {
       const result = await this.speedrunTypeRepository.save(type);
       return Result.fromResult(result);

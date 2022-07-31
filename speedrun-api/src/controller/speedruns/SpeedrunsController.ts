@@ -88,8 +88,9 @@ export default class SpeedrunsController {
     response: Response,
     next: NextFunction
   ): Promise<Result<Speedrun>> {
+    const { userId, typeId, time } = request.body;
     const type = await this.speedrunTypeRepository.findOneBy({
-      id: request.body.groupId,
+      id: typeId,
     });
 
     if (type == null) {
@@ -100,7 +101,7 @@ export default class SpeedrunsController {
     }
 
     const user = await this.userTypeRepository.findOneBy({
-      id: request.body.userId,
+      id: userId,
     });
 
     if (user == null) {
@@ -111,8 +112,9 @@ export default class SpeedrunsController {
     }
 
     const speedrun = new Speedrun();
-    speedrun.time = request.body.time;
+    speedrun.time = time;
     speedrun.type = type;
+    speedrun.user = user;
     try {
       const result = await this.speedrunRepository.save(speedrun);
       return Result.fromResult(result);
@@ -142,8 +144,6 @@ export default class SpeedrunsController {
       });
     }
 
-    speedrun.time = time ?? speedrun.time;
-
     let user: User;
     if (userId != null) {
       user = await this.userTypeRepository.findOneBy({
@@ -155,7 +155,6 @@ export default class SpeedrunsController {
           status: 400,
         });
       }
-      speedrun.user = user;
     }
 
     let type: SpeedrunType;
@@ -169,8 +168,11 @@ export default class SpeedrunsController {
           status: 400,
         });
       }
-      speedrun.type = type;
     }
+
+    speedrun.time = time ?? speedrun.time;
+    speedrun.type = type ?? speedrun.type;
+    speedrun.user = user ?? speedrun.user;
 
     try {
       const result = await this.speedrunRepository.save(speedrun);
