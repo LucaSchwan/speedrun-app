@@ -5,7 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import User from '../User';
+import User from '../user/User';
 import SpeedrunType from './SpeedrunType';
 
 @Entity({ name: 'speedrun' })

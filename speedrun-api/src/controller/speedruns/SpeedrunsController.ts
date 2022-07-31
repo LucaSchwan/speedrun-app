@@ -6,7 +6,7 @@ import { AppDataSource } from '../../data-source';
 import Result from '../../helper/Result';
 import Route from '../../helper/Route';
 import SpeedrunType from '../../entities/speedruns/SpeedrunType';
-import User from '../../entities/User';
+import User from '../../entities/user/User';
 
 export default class SpeedrunsController {
   public static routes: Route[] = [

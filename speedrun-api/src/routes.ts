@@ -1,11 +1,15 @@
-import UserController from './controller/UserController';
+import UserController from './controller/user/UserController';
 import SpeedrunCategoriesController from './controller/speedruns/SpeedrunCategoriesController';
 import SpeedrunGroupsController from './controller/speedruns/SpeedrunGroupsController';
 import SpeedrunTypesController from './controller/speedruns/SpeedrunTypeController';
 import SpeedrunsController from './controller/speedruns/SpeedrunsController';
+import LoginController from './controller/user/LoginController';
+import UserSessionController from './controller/user/UserSessionController';
 
 const Routes = [
   ...UserController.routes,
+  ...LoginController.routes,
+  ...UserSessionController.routes,
   ...SpeedrunCategoriesController.routes,
   ...SpeedrunGroupsController.routes,
   ...SpeedrunTypesController.routes,
