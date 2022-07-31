@@ -6,6 +6,7 @@ import { AppDataSource } from '../../data-source';
 import Result from '../../helper/Result';
 import Route from '../../helper/Route';
 import SpeedrunType from '../../entities/speedruns/SpeedrunType';
+import User from '../../entities/User';
 
 export default class SpeedrunsController {
   public static routes: Route[] = [
@@ -44,6 +45,8 @@ export default class SpeedrunsController {
   private speedrunRepository = AppDataSource.getRepository(Speedrun);
 
   private speedrunTypeRepository = AppDataSource.getRepository(SpeedrunType);
+
+  private userTypeRepository = AppDataSource.getRepository(User);
 
   async all(
     request: Request,
@@ -96,6 +99,17 @@ export default class SpeedrunsController {
       });
     }
 
+    const user = await this.userTypeRepository.findOneBy({
+      id: request.body.userId,
+    });
+
+    if (user == null) {
+      return Result.fromError({
+        message: 'The User to update the Speedrun with was not found',
+        status: 400,
+      });
+    }
+
     const speedrun = new Speedrun();
     speedrun.time = request.body.time;
     speedrun.type = type;
@@ -104,7 +118,7 @@ export default class SpeedrunsController {
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
-        message: 'Error creating Speedrun-Group',
+        message: 'Error creating Speedrun',
         status: 400,
         innerError: e,
       });
@@ -116,26 +130,47 @@ export default class SpeedrunsController {
     response: Response,
     next: NextFunction
   ): Promise<Result<Speedrun>> {
+    const { userId, typeId, time } = request.body;
+
     const speedrun = await this.speedrunRepository.findOneBy({
       id: Number(request.params.id),
     });
     if (speedrun == null) {
       return Result.fromError({
-        message: 'Speedrun to update not found',
+        message: 'Speedrun to update was not found',
         status: 404,
       });
     }
 
-    const { typeId } = request.body;
+    speedrun.time = time ?? speedrun.time;
+
+    let user: User;
+    if (userId != null) {
+      user = await this.userTypeRepository.findOneBy({
+        id: userId,
+      });
+      if (user == null) {
+        return Result.fromError({
+          message: 'The User to update the Speedrun with was not found',
+          status: 400,
+        });
+      }
+      speedrun.user = user;
+    }
+
     let type: SpeedrunType;
     if (typeId !== null) {
       type = await this.speedrunTypeRepository.findOneBy({
         id: typeId,
       });
+      if (type == null) {
+        return Result.fromError({
+          message: "The Speedrun-Type doesn't exist",
+          status: 400,
+        });
+      }
       speedrun.type = type;
     }
-
-    speedrun.time = request.body.time ?? speedrun.time;
 
     try {
       const result = await this.speedrunRepository.save(speedrun);
