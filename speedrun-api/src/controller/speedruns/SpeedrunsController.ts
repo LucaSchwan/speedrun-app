@@ -151,7 +151,7 @@ export default class SpeedrunsController {
       });
       if (user == null) {
         return Result.fromError({
-          message: 'The User to update the Speedrun with was not found',
+          message: "The User doesn't exist",
           status: 400,
         });
       }

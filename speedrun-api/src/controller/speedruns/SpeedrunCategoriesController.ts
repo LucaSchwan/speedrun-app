@@ -95,6 +95,7 @@ export default class SpeedrunCategoriesController {
     response: Response,
     next: NextFunction
   ): Promise<Result<SpeedrunCategory>> {
+    const { name, description } = request.body;
     const category = await this.speedrunCategoryRepository.findOneBy({
       id: Number(request.params.id),
     });
@@ -105,8 +106,8 @@ export default class SpeedrunCategoriesController {
       });
     }
 
-    category.name = request.body.name ?? category.name;
-    category.description = request.body.description ?? category.description;
+    category.name = name ?? category.name;
+    category.description = description ?? category.description;
     try {
       const result = await this.speedrunCategoryRepository.save(category);
       return Result.fromResult(result);

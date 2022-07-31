@@ -86,8 +86,9 @@ export default class SpeedrunGroupsController {
     response: Response,
     next: NextFunction
   ): Promise<Result<SpeedrunGroup>> {
+    const { categoryId, name, description } = request.body;
     const category = await this.speedrunCategoryRepository.findOneBy({
-      id: request.body.categoryId,
+      id: categoryId,
     });
 
     if (category == null) {
@@ -98,8 +99,8 @@ export default class SpeedrunGroupsController {
     }
 
     const group = new SpeedrunGroup();
-    group.name = request.body.name;
-    group.description = request.body.description;
+    group.name = name;
+    group.description = description;
     group.category = category;
     try {
       const result = await this.speedrunGroupRepository.save(group);
