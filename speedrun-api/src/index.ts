@@ -6,6 +6,8 @@ import { Request, Response } from 'express';
 import { AppDataSource } from './data-source';
 import Routes from './routes';
 import Result from './helper/Result';
+import UserSessionService from './services/UserSessionService';
+import UserSession from './entities/user/UserSession';
 
 AppDataSource.initialize()
   .then(async () => {
@@ -17,9 +19,34 @@ AppDataSource.initialize()
     Routes.forEach((route) => {
       (app as any)[route.method](
         `/api/v1${route.route}`,
-        (req: Request, res: Response, next: Function) => {
+        async (req: Request, res: Response, next: Function) => {
+          const sessionService = new UserSessionService();
+          const { sessionId } = req.body;
+          let session: UserSession = null;
+          if (sessionId != null) {
+            const sessionMaybe = await sessionService.getSession(sessionId);
+            if (sessionMaybe.error) {
+              res.status(sessionMaybe.error.status).json(sessionMaybe.error);
+            }
+
+            const validatingResult = await sessionService.validateSession(
+              sessionMaybe.result
+            );
+            if (validatingResult.error) {
+              res
+                .status(validatingResult.error.status)
+                .json(validatingResult.error);
+            }
+            session = sessionMaybe.result;
+          }
+
           const routeFunction: Promise<Result<any>> =
-            new (route.controller as any)()[route.action](req, res, next);
+            new (route.controller as any)()[route.action](
+              req,
+              res,
+              next,
+              session
+            );
           routeFunction.then((result) => {
             if (result.error == null) {
               res.json(result.result);
@@ -38,7 +65,6 @@ AppDataSource.initialize()
     });
 
     // setup express app here
-    // ...
 
     // start express server
     app.listen(3000);

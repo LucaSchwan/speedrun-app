@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as bcrypt from 'bcrypt';
 import { AppDataSource } from '../data-source';
 import User from '../entities/user/User';

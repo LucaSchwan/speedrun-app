@@ -5,6 +5,7 @@ import SpeedrunCategory from '../../entities/speedruns/SpeedrunCategory';
 import { AppDataSource } from '../../data-source';
 import Result from '../../helper/Result';
 import Route from '../../helper/Route';
+import UserSession from '../../entities/user/UserSession';
 
 export default class SpeedrunCategoriesController {
   public static routes: Route[] = [
@@ -46,7 +47,8 @@ export default class SpeedrunCategoriesController {
   async all(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SpeedrunCategory[]>> {
     const categories = await this.speedrunCategoryRepository.find();
     return categories == null
@@ -60,7 +62,8 @@ export default class SpeedrunCategoriesController {
   async one(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SpeedrunCategory>> {
     const category = await this.speedrunCategoryRepository.findOneBy({
       id: Number(request.params.id),
@@ -76,7 +79,8 @@ export default class SpeedrunCategoriesController {
   async create(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SpeedrunCategory>> {
     try {
       const result = await this.speedrunCategoryRepository.save(request.body);
@@ -123,7 +127,8 @@ export default class SpeedrunCategoriesController {
   async remove(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<any>> {
     const categoryToRemove = await this.speedrunCategoryRepository.findOneBy({
       id: Number(request.params.id),

@@ -41,8 +41,16 @@ export default class LoginController {
   async login(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<UserSession[]>> {
+    if (session != null) {
+      return Result.fromError({
+        message: 'User is already logged in',
+        status: 400,
+      });
+    }
+
     const { email, name, password, stayLoggedIn } = request.body;
     let user = await this.userRepository.findOneBy({ name });
     if (user == null) user = await this.userRepository.findOneBy({ email });
@@ -75,11 +83,11 @@ export default class LoginController {
   async logout(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<any>> {
-    const { sessionId } = request.body;
     const sessionMaybe = await this.userSessionService.invalidateSession(
-      sessionId
+      session.id
     );
     if (sessionMaybe.error) {
       return Result.fromError(sessionMaybe.error);
@@ -90,8 +98,15 @@ export default class LoginController {
   async register(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<UserSession>> {
+    if (session != null) {
+      return Result.fromError({
+        message: 'There is already a logged in user',
+        status: 400,
+      });
+    }
     const { email, name, password } = request.body;
     const userMaybe = await this.userService.createUser(email, password, name);
     if (userMaybe.error) {

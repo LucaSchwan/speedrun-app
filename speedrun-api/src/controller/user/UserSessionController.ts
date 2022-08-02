@@ -27,8 +27,10 @@ export default class UserSessionController {
   async all(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSesssion
   ): Promise<Result<UserSesssion[]>> {
+    // should be admin to get other users sessions
     const userSessions = await this.UserSessionRepository.find({
       relations: ['user'],
     });
@@ -43,8 +45,10 @@ export default class UserSessionController {
   async one(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSesssion
   ): Promise<Result<UserSesssion>> {
+    // should be admin to get other users sessions
     const userSessions = await this.UserSessionRepository.findOne({
       where: {
         id: Number(request.params.id),

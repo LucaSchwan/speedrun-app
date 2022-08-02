@@ -8,6 +8,26 @@ export default class UserSessionService {
 
   private userRepository = AppDataSource.getRepository(User);
 
+  public async getSession(sessionId: number): Promise<Result<UserSession>> {
+    const session = await this.userSessionRepository.findOneBy({
+      id: sessionId,
+    });
+
+    if (session == null) {
+      return Result.fromError({
+        message: 'Session not found',
+        status: 404,
+      });
+    }
+
+    return session.expirationDate < new Date()
+      ? Result.fromError({
+          message: 'Session expired',
+          status: 400,
+        })
+      : Result.fromResult(session);
+  }
+
   public async create(
     user: User,
     stayLoggedIn: boolean
@@ -33,7 +53,7 @@ export default class UserSessionService {
     ) {
       return Result.fromError({
         message: 'User already has a session',
-        status: 400,
+        status: 409,
       });
     }
 
@@ -55,16 +75,24 @@ export default class UserSessionService {
   }
 
   public async validateSession(
-    session: UserSession,
-    user: User
+    session: UserSession
   ): Promise<Result<UserSession>> {
     const userSession = await this.userSessionRepository.findOneBy({
       id: session.id,
-      user,
+      user: session.user,
     });
+
+    if (userSession == null) {
+      return Result.fromError({
+        message: 'Session not found',
+        status: 404,
+      });
+    }
+
     if (userSession.expirationDate < new Date()) {
       return Result.fromError({
         message: 'Session expired',
+        status: 400,
       });
     }
     return Result.fromResult(userSession);

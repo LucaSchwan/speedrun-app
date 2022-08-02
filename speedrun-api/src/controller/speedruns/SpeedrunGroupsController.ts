@@ -6,6 +6,7 @@ import { AppDataSource } from '../../data-source';
 import Result from '../../helper/Result';
 import Route from '../../helper/Route';
 import SpeedrunCategory from '../../entities/speedruns/SpeedrunCategory';
+import UserSession from '../../entities/user/UserSession';
 
 export default class SpeedrunGroupsController {
   public static routes: Route[] = [
@@ -49,7 +50,8 @@ export default class SpeedrunGroupsController {
   async all(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SpeedrunGroup[]>> {
     const groups = await this.speedrunGroupRepository.find({
       relations: ['category'],
@@ -65,7 +67,8 @@ export default class SpeedrunGroupsController {
   async one(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SpeedrunGroup>> {
     const group = await this.speedrunGroupRepository.findOne({
       where: {
@@ -84,7 +87,8 @@ export default class SpeedrunGroupsController {
   async create(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SpeedrunGroup>> {
     const { categoryId, name, description } = request.body;
     const category = await this.speedrunCategoryRepository.findOneBy({
@@ -118,7 +122,8 @@ export default class SpeedrunGroupsController {
   async update(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SpeedrunGroup>> {
     const { name, description, categoryId } = request.body;
     const group = await this.speedrunGroupRepository.findOneBy({
@@ -157,7 +162,8 @@ export default class SpeedrunGroupsController {
   async remove(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<any>> {
     const speedrunCategoryToRemove =
       await this.speedrunGroupRepository.findOneBy({

@@ -7,6 +7,7 @@ import Result from '../../helper/Result';
 import Route from '../../helper/Route';
 import SpeedrunType from '../../entities/speedruns/SpeedrunType';
 import User from '../../entities/user/User';
+import UserSession from '../../entities/user/UserSession';
 
 export default class SpeedrunsController {
   public static routes: Route[] = [
@@ -51,7 +52,8 @@ export default class SpeedrunsController {
   async all(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<Speedrun[]>> {
     const speedruns = await this.speedrunRepository.find({
       relations: ['type'],
@@ -67,7 +69,8 @@ export default class SpeedrunsController {
   async one(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<Speedrun>> {
     const speedrun = await this.speedrunRepository.findOne({
       where: {
@@ -86,9 +89,17 @@ export default class SpeedrunsController {
   async create(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<Speedrun>> {
-    const { userId, typeId, time } = request.body;
+    if (session == null) {
+      return Result.fromError({
+        message: 'You are not logged in',
+        status: 401,
+      });
+    }
+
+    const { typeId, time } = request.body;
     const type = await this.speedrunTypeRepository.findOneBy({
       id: typeId,
     });
@@ -100,21 +111,10 @@ export default class SpeedrunsController {
       });
     }
 
-    const user = await this.userTypeRepository.findOneBy({
-      id: userId,
-    });
-
-    if (user == null) {
-      return Result.fromError({
-        message: 'The User to update the Speedrun with was not found',
-        status: 400,
-      });
-    }
-
     const speedrun = new Speedrun();
     speedrun.time = time;
     speedrun.type = type;
-    speedrun.user = user;
+    speedrun.user = session.user;
     try {
       const result = await this.speedrunRepository.save(speedrun);
       return Result.fromResult(result);
@@ -130,9 +130,17 @@ export default class SpeedrunsController {
   async update(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<Speedrun>> {
-    const { userId, typeId, time } = request.body;
+    if (session == null) {
+      return Result.fromError({
+        message: 'You are not logged in',
+        status: 401,
+      });
+    }
+
+    const { typeId, time } = request.body;
 
     const speedrun = await this.speedrunRepository.findOneBy({
       id: Number(request.params.id),
@@ -142,19 +150,6 @@ export default class SpeedrunsController {
         message: 'Speedrun to update was not found',
         status: 404,
       });
-    }
-
-    let user: User;
-    if (userId != null) {
-      user = await this.userTypeRepository.findOneBy({
-        id: userId,
-      });
-      if (user == null) {
-        return Result.fromError({
-          message: "The User doesn't exist",
-          status: 400,
-        });
-      }
     }
 
     let type: SpeedrunType;
@@ -170,9 +165,16 @@ export default class SpeedrunsController {
       }
     }
 
+    // admin role should be able to update any speedrun
+    if (session.user.id !== speedrun.user.id) {
+      return Result.fromError({
+        message: 'You are not allowed to update this Speedrun',
+        status: 401,
+      });
+    }
+
     speedrun.time = time ?? speedrun.time;
     speedrun.type = type ?? speedrun.type;
-    speedrun.user = user ?? speedrun.user;
 
     try {
       const result = await this.speedrunRepository.save(speedrun);
@@ -189,8 +191,16 @@ export default class SpeedrunsController {
   async remove(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<any>> {
+    if (session == null) {
+      return Result.fromError({
+        message: 'You are not logged in',
+        status: 401,
+      });
+    }
+
     const speedrunToRemove = await this.speedrunRepository.findOneBy({
       id: Number(request.params.id),
     });
@@ -200,6 +210,15 @@ export default class SpeedrunsController {
         status: 404,
       });
     }
+
+    // admin role should be able to delete any speedrun
+    if (session.user.id !== speedrunToRemove.user.id) {
+      return Result.fromError({
+        message: 'You are not allowed to delete this Speedrun',
+        status: 401,
+      });
+    }
+
     try {
       await this.speedrunRepository.remove(speedrunToRemove);
       return Result.fromResult({

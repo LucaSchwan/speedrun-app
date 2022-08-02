@@ -7,6 +7,7 @@ import { AppDataSource } from '../../data-source';
 import Result from '../../helper/Result';
 import Route from '../../helper/Route';
 import UserService from '../../services/UserService';
+import UserSession from '../../entities/user/UserSession';
 
 export default class UserController {
   public static routes: Route[] = [
@@ -49,7 +50,8 @@ export default class UserController {
   async all(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<User[]>> {
     const user = await this.userRepository.find();
     return user == null
@@ -63,7 +65,8 @@ export default class UserController {
   async one(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<User>> {
     const user = await this.userRepository.findOneBy({
       id: Number(request.params.id),
@@ -79,7 +82,8 @@ export default class UserController {
   async create(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<User>> {
     const { email, name, password } = request.body;
     return this.userService.createUser(email, password, name);
@@ -88,22 +92,47 @@ export default class UserController {
   async update(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<User>> {
+    let id: number;
+    if (request.params.id) {
+      id = Number(request.params.id);
+      // but should be admin to update other users
+    }
+    if (session != null) {
+      id = session.user.id;
+    } else {
+      return Result.fromError({
+        message: 'No Id to update',
+        status: 401,
+      });
+    }
+
     const { email, name, password } = request.body;
-    return this.userService.updateUser(
-      Number(request.params.id),
-      name,
-      email,
-      password
-    );
+    return this.userService.updateUser(id, name, email, password);
   }
 
   async remove(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<any>> {
-    return this.userService.removeUser(Number(request.params.id));
+    let id: number;
+    if (request.params.id) {
+      id = Number(request.params.id);
+      // but should be admin to delete other users
+    }
+    if (session != null) {
+      id = session.user.id;
+    } else {
+      return Result.fromError({
+        message: 'No Id to update',
+        status: 401,
+      });
+    }
+
+    return this.userService.removeUser(id);
   }
 }

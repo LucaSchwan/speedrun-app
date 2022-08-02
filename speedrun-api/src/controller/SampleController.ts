@@ -3,6 +3,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import SampleEntity from '../entities/SampleEntity';
+import UserSession from '../entities/user/UserSession';
 import Result from '../helper/Result';
 import Route from '../helper/Route';
 
@@ -21,7 +22,8 @@ export default class SampleController {
   async all(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SampleEntity[]>> {
     const samples = await this.userRepository.find();
     return samples == null

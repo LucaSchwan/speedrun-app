@@ -6,6 +6,7 @@ import { AppDataSource } from '../../data-source';
 import Result from '../../helper/Result';
 import Route from '../../helper/Route';
 import SpeedrunGroup from '../../entities/speedruns/SpeedrunGroup';
+import UserSession from '../../entities/user/UserSession';
 
 export default class SpeedrunTypesController {
   public static routes: Route[] = [
@@ -48,7 +49,8 @@ export default class SpeedrunTypesController {
   async all(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SpeedrunType[]>> {
     const types = await this.speedrunTypeRepository.find({
       relations: ['group'],
@@ -64,7 +66,8 @@ export default class SpeedrunTypesController {
   async one(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SpeedrunType>> {
     const type = await this.speedrunTypeRepository.findOne({
       where: {
@@ -83,7 +86,8 @@ export default class SpeedrunTypesController {
   async create(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SpeedrunType>> {
     const { groupId, name, description } = request.body;
     const group = await this.speedrunGroupRepository.findOneBy({
@@ -117,7 +121,8 @@ export default class SpeedrunTypesController {
   async update(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<SpeedrunType>> {
     const { name, description, groupId } = request.body;
     const type = await this.speedrunTypeRepository.findOneBy({
@@ -156,7 +161,8 @@ export default class SpeedrunTypesController {
   async remove(
     request: Request,
     response: Response,
-    next: NextFunction
+    next: NextFunction,
+    session: UserSession
   ): Promise<Result<any>> {
     const typeToRemove = await this.speedrunTypeRepository.findOneBy({
       id: Number(request.params.id),
