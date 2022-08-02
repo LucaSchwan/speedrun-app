@@ -29,6 +29,19 @@ export default class LoginController {
       route: '/register',
       controller: LoginController,
       action: 'register',
+      auth: 'none',
+    },
+    {
+      method: 'put',
+      route: '/update-user',
+      controller: LoginController,
+      action: 'update',
+    },
+    {
+      method: 'remove',
+      route: '/delete-user',
+      controller: LoginController,
+      action: 'delete',
     },
   ];
 
@@ -52,8 +65,7 @@ export default class LoginController {
     }
 
     const { email, name, password, stayLoggedIn } = request.body;
-    let user = await this.userRepository.findOneBy({ name });
-    if (user == null) user = await this.userRepository.findOneBy({ email });
+    const user = await this.userRepository.findOneBy([{ name }, { email }]);
     if (user == null) {
       return Result.fromError({
         message: 'Wrong Credentials',
@@ -123,5 +135,36 @@ export default class LoginController {
     }
 
     return Result.fromResult(sessionMaybe.result);
+  }
+
+  async update(
+    request: Request,
+    response: Response,
+    next: NextFunction,
+    session: UserSession
+  ): Promise<Result<User>> {
+    const { name, password } = request.body;
+    const userMaybe = await this.userService.updateUser(
+      session.user.id,
+      name,
+      password
+    );
+    if (userMaybe.error) {
+      return Result.fromError(userMaybe.error);
+    }
+    return Result.fromResult(userMaybe.result);
+  }
+
+  async remove(
+    request: Request,
+    response: Response,
+    next: NextFunction,
+    session: UserSession
+  ): Promise<Result<Message>> {
+    const userMaybe = await this.userService.removeUser(session.user.id);
+    if (userMaybe.error) {
+      return Result.fromError(userMaybe.error);
+    }
+    return Result.fromResult({ message: 'User removed' });
   }
 }
