@@ -5,10 +5,11 @@ import Result, { Message } from '../helper/Result';
 export default class UserRoleService {
   private userRoleRepository = AppDataSource.getRepository(UserRole);
 
-  async getUserRole(id: number): Promise<Result<UserRole>> {
-    const userRole = await this.userRoleRepository.findOneBy({
-      id: Number(id),
-    });
+  async getUserRole(id?: number, name?: string): Promise<Result<UserRole>> {
+    const where: FindOptionsWhere<UserRole>[] = [];
+    if (id) where.push({ id });
+    if (name) where.push({ name });
+    const userRole = await this.userRoleRepository.findOneBy(where);
     if (userRole == null) {
       return Result.fromError({
         message: 'User-Role was not found',
