@@ -13,30 +13,35 @@ export default class SpeedrunCategoriesController {
       route: '/speedrun-categories',
       controller: SpeedrunCategoriesController,
       action: 'all',
+      auth: 'none',
     },
     {
       method: 'get',
       route: '/speedrun-categories/:id',
       controller: SpeedrunCategoriesController,
       action: 'one',
+      auth: 'none',
     },
     {
       method: 'post',
       route: '/speedrun-categories',
       controller: SpeedrunCategoriesController,
       action: 'create',
+      auth: 'session',
     },
     {
       method: 'put',
       route: '/speedrun-categories/:id',
       controller: SpeedrunCategoriesController,
       action: 'update',
+      auth: 'session',
     },
     {
       method: 'delete',
       route: '/speedrun-categories/:id',
       controller: SpeedrunCategoriesController,
       action: 'remove',
+      auth: 'session',
     },
   ];
 
@@ -52,7 +57,7 @@ export default class SpeedrunCategoriesController {
     const categories = await this.speedrunCategoryRepository.find();
     return categories == null
       ? Result.fromError({
-          message: 'Error getting Speedrun-Categories',
+          message: 'Error getting speedrun categories',
           status: 404,
         })
       : Result.fromResult(categories);
@@ -69,7 +74,7 @@ export default class SpeedrunCategoriesController {
     });
     return category == null
       ? Result.fromError({
-          message: 'Speedrun-Category not found',
+          message: 'Speedrun category not found',
           status: 404,
         })
       : Result.fromResult(category);
@@ -86,7 +91,7 @@ export default class SpeedrunCategoriesController {
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
-        message: 'Error creating Speedrun-Category',
+        message: 'Error creating speedrun category',
         status: 400,
         innerError: e,
       });
@@ -104,7 +109,7 @@ export default class SpeedrunCategoriesController {
     });
     if (category == null) {
       return Result.fromError({
-        message: 'Speedrun-Category to update not found',
+        message: 'Speedrun category to update not found',
         status: 404,
       });
     }
@@ -116,7 +121,7 @@ export default class SpeedrunCategoriesController {
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
-        message: 'Error updating Speedrun-Category',
+        message: 'Error updating speedrun category',
         status: 400,
         innerError: e,
       });
@@ -134,18 +139,18 @@ export default class SpeedrunCategoriesController {
     });
     if (categoryToRemove == null) {
       return Result.fromError({
-        message: 'Speedrun-Category to delete was not found',
+        message: 'Speedrun category to delete was not found',
         status: 404,
       });
     }
     try {
       await this.speedrunCategoryRepository.remove(categoryToRemove);
       return Result.fromResult({
-        message: 'Speedrun-Category succesfully removed',
+        message: 'Speedrun category succesfully removed',
       });
     } catch (e) {
       return Result.fromError({
-        message: 'Speedrun-Category could not be removed',
+        message: 'Speedrun category could not be removed',
         status: 400,
         innerError: e,
       });

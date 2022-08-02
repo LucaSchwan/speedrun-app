@@ -5,11 +5,13 @@ import SpeedrunTypesController from './controller/speedruns/SpeedrunTypeControll
 import SpeedrunsController from './controller/speedruns/SpeedrunsController';
 import LoginController from './controller/user/LoginController';
 import UserSessionController from './controller/user/UserSessionController';
+import UserRoleController from './controller/user/UserRoleController';
 
 const Routes = [
   ...UserController.routes,
   ...LoginController.routes,
   ...UserSessionController.routes,
+  ...UserRoleController.routes,
   ...SpeedrunCategoriesController.routes,
   ...SpeedrunGroupsController.routes,
   ...SpeedrunTypesController.routes,

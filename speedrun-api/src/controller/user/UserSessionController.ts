@@ -12,12 +12,14 @@ export default class UserSessionController {
       route: '/sessions',
       controller: UserSessionController,
       action: 'all',
+      auth: 'none',
     },
     {
       method: 'get',
       route: '/sessions/:id',
       controller: UserSessionController,
       action: 'one',
+      auth: 'none',
     },
   ];
 
@@ -35,7 +37,7 @@ export default class UserSessionController {
     });
     return userSessions == null
       ? Result.fromError({
-          message: 'Error getting User-Sessions',
+          message: 'Error getting user sessions',
           status: 404,
         })
       : Result.fromResult(userSessions);
@@ -56,7 +58,7 @@ export default class UserSessionController {
     });
     return userSessions == null
       ? Result.fromError({
-          message: 'User-Session not found',
+          message: 'User session not found',
           status: 404,
         })
       : Result.fromResult(userSessions);

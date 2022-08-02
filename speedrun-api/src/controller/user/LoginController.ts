@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { AppDataSource } from '../../data-source';
@@ -17,12 +16,14 @@ export default class LoginController {
       route: '/login',
       controller: LoginController,
       action: 'login',
+      auth: 'none',
     },
     {
       method: 'put',
       route: '/logout',
       controller: LoginController,
       action: 'logout',
+      auth: 'session',
     },
     {
       method: 'post',
@@ -36,12 +37,14 @@ export default class LoginController {
       route: '/update-user',
       controller: LoginController,
       action: 'update',
+      auth: 'session',
     },
     {
-      method: 'remove',
+      method: 'delete',
       route: '/delete-user',
       controller: LoginController,
-      action: 'delete',
+      action: 'remove',
+      auth: 'admin',
     },
   ];
 
@@ -104,7 +107,7 @@ export default class LoginController {
     if (sessionMaybe.error) {
       return Result.fromError(sessionMaybe.error);
     }
-    return Result.fromResult({ message: 'Logged User out' });
+    return Result.fromResult({ message: 'Logged user out' });
   }
 
   async register(

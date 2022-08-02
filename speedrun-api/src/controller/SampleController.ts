@@ -14,6 +14,7 @@ export default class SampleController {
       route: '/sample',
       controller: SampleController,
       action: 'all',
+      auth: 'none',
     },
   ];
 
@@ -28,7 +29,7 @@ export default class SampleController {
     const samples = await this.userRepository.find();
     return samples == null
       ? Result.fromError({
-          message: 'No Sample found',
+          message: 'No sample found',
           status: 404,
         })
       : Result.fromResult(samples);

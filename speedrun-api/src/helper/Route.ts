@@ -4,4 +4,5 @@ export default interface Route {
   route: string;
   controller: any;
   action: string;
+  auth: 'none' | 'session' | 'admin';
 }

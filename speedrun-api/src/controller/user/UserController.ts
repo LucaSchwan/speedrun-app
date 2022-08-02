@@ -16,30 +16,42 @@ export default class UserController {
       route: '/users',
       controller: UserController,
       action: 'all',
+      auth: 'none',
     },
     {
       method: 'get',
       route: '/users/:id',
       controller: UserController,
       action: 'one',
+      auth: 'none',
     },
     {
       method: 'post',
       route: '/users',
       controller: UserController,
       action: 'create',
+      auth: 'admin',
     },
     {
       method: 'put',
       route: '/users/:id',
       controller: UserController,
       action: 'update',
+      auth: 'admin',
     },
     {
       method: 'delete',
       route: '/users/:id',
       controller: UserController,
       action: 'remove',
+      auth: 'admin',
+    },
+    {
+      method: 'put',
+      route: '/users/:id/add-role',
+      controller: UserController,
+      action: 'addRole',
+      auth: 'session',
     },
   ];
 
@@ -47,17 +59,20 @@ export default class UserController {
 
   private userService = new UserService();
 
+  private userRoleService = new UserRoleService();
+
   async all(
     request: Request,
     response: Response,
     next: NextFunction,
     session: UserSession
   ): Promise<Result<User[]>> {
-    const user = await this.userRepository.find();
+    const user = await this.userRepository.find({
+      relations: ['roles'],
     });
     return user == null
       ? Result.fromError({
-          message: 'No Users found',
+          message: 'No users found',
           status: 404,
         })
       : Result.fromResult(user);
@@ -69,8 +84,11 @@ export default class UserController {
     next: NextFunction,
     session: UserSession
   ): Promise<Result<User>> {
-    const user = await this.userRepository.findOneBy({
-      id: Number(request.params.id),
+    const user = await this.userRepository.findOne({
+      where: {
+        id: Number(request.params.id),
+      },
+      relations: ['roles'],
     });
     return user == null
       ? Result.fromError({
@@ -96,20 +114,7 @@ export default class UserController {
     next: NextFunction,
     session: UserSession
   ): Promise<Result<User>> {
-    let id: number;
-    if (request.params.id) {
-      id = Number(request.params.id);
-      // but should be admin to update other users
-    }
-    if (session != null) {
-      id = session.user.id;
-    } else {
-      return Result.fromError({
-        message: 'No Id to update',
-        status: 401,
-      });
-    }
-
+    const id = Number(request.params.id);
     const { email, name, password } = request.body;
     return this.userService.updateUser(id, name, email, password);
   }
@@ -120,20 +125,23 @@ export default class UserController {
     next: NextFunction,
     session: UserSession
   ): Promise<Result<Message>> {
-    let id: number;
-    if (request.params.id) {
-      id = Number(request.params.id);
-      // but should be admin to delete other users
-    }
-    if (session != null) {
-      id = session.user.id;
-    } else {
-      return Result.fromError({
-        message: 'No Id to update',
-        status: 401,
-      });
+    const id = Number(request.params.id);
+    return this.userService.removeUser(id);
+  }
+
+  async addRole(
+    request: Request,
+    response: Response,
+    next: NextFunction,
+    session: UserSession
+  ): Promise<Result<Message>> {
+    const id = Number(request.params.id);
+    const { roleId, name } = request.body;
+    const roleMaybe = await this.userRoleService.getUserRole(roleId, name);
+    if (roleMaybe.error) {
+      return Result.fromError(roleMaybe.error);
     }
 
-    return this.userService.removeUser(id);
+    return this.userService.addRole(id, roleMaybe.result);
   }
 }

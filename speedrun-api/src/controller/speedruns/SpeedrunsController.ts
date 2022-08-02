@@ -15,30 +15,35 @@ export default class SpeedrunsController {
       route: '/speedruns',
       controller: SpeedrunsController,
       action: 'all',
+      auth: 'none',
     },
     {
       method: 'get',
       route: '/speedruns/:id',
       controller: SpeedrunsController,
       action: 'one',
+      auth: 'none',
     },
     {
       method: 'post',
       route: '/speedruns',
       controller: SpeedrunsController,
       action: 'create',
+      auth: 'session',
     },
     {
       method: 'put',
       route: '/speedruns/:id',
       controller: SpeedrunsController,
       action: 'update',
+      auth: 'session',
     },
     {
       method: 'delete',
       route: '/speedruns/:id',
       controller: SpeedrunsController,
       action: 'remove',
+      auth: 'session',
     },
   ];
 
@@ -59,7 +64,7 @@ export default class SpeedrunsController {
     });
     return speedruns == null
       ? Result.fromError({
-          message: 'Error getting Speedruns',
+          message: 'Error getting speedruns',
           status: 404,
         })
       : Result.fromResult(speedruns);
@@ -105,7 +110,7 @@ export default class SpeedrunsController {
 
     if (type == null) {
       return Result.fromError({
-        message: "The Speedrun-Type doesn't exist",
+        message: "The Speedrun type doesn't exist",
         status: 400,
       });
     }
@@ -119,7 +124,7 @@ export default class SpeedrunsController {
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
-        message: 'Error creating Speedrun',
+        message: 'Error creating speedrun',
         status: 400,
         innerError: e,
       });
@@ -158,13 +163,12 @@ export default class SpeedrunsController {
       });
       if (type == null) {
         return Result.fromError({
-          message: "The Speedrun-Type doesn't exist",
+          message: "The Speedrun type doesn't exist",
           status: 400,
         });
       }
     }
 
-    // admin role should be able to update any speedrun
     if (session.user.id !== speedrun.user.id) {
       return Result.fromError({
         message: 'You are not allowed to update this Speedrun',
@@ -180,7 +184,7 @@ export default class SpeedrunsController {
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
-        message: 'Error updating Speedrun',
+        message: 'Error updating speedrun',
         status: 400,
         innerError: e,
       });

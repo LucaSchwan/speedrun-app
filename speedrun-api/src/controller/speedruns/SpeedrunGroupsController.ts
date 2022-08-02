@@ -14,30 +14,35 @@ export default class SpeedrunGroupsController {
       route: '/speedrun-groups',
       controller: SpeedrunGroupsController,
       action: 'all',
+      auth: 'none',
     },
     {
       method: 'get',
       route: '/speedrun-groups/:id',
       controller: SpeedrunGroupsController,
       action: 'one',
+      auth: 'none',
     },
     {
       method: 'post',
       route: '/speedrun-groups',
       controller: SpeedrunGroupsController,
       action: 'create',
+      auth: 'session',
     },
     {
       method: 'put',
       route: '/speedrun-groups/:id',
       controller: SpeedrunGroupsController,
       action: 'update',
+      auth: 'session',
     },
     {
       method: 'delete',
       route: '/speedrun-groups/:id',
       controller: SpeedrunGroupsController,
       action: 'remove',
+      auth: 'session',
     },
   ];
 
@@ -57,7 +62,7 @@ export default class SpeedrunGroupsController {
     });
     return groups == null
       ? Result.fromError({
-          message: 'Error getting Speedrun-Groups',
+          message: 'Error getting Speedrun groups',
           status: 404,
         })
       : Result.fromResult(groups);
@@ -77,7 +82,7 @@ export default class SpeedrunGroupsController {
     });
     return group == null
       ? Result.fromError({
-          message: 'Speedrun-Group not found',
+          message: 'Speedrun group not found',
           status: 404,
         })
       : Result.fromResult(group);
@@ -96,7 +101,7 @@ export default class SpeedrunGroupsController {
 
     if (category == null) {
       return Result.fromError({
-        message: "The Speedrun-Category doesn't exist",
+        message: "The speedrun category doesn't exist",
         status: 400,
       });
     }
@@ -111,7 +116,7 @@ export default class SpeedrunGroupsController {
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
-        message: 'Error creating Speedrun-Group',
+        message: 'Error creating speedrun group',
         status: 400,
         innerError: e,
       });
@@ -130,7 +135,7 @@ export default class SpeedrunGroupsController {
     });
     if (group == null) {
       return Result.fromError({
-        message: 'Speedrun-Group to update not found',
+        message: 'Speedrun group to update not found',
         status: 404,
       });
     }
@@ -151,7 +156,7 @@ export default class SpeedrunGroupsController {
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
-        message: 'Error updating Speedrun-Group',
+        message: 'Error updating speedrun group',
         status: 400,
         innerError: e,
       });
@@ -170,18 +175,18 @@ export default class SpeedrunGroupsController {
       });
     if (speedrunCategoryToRemove == null) {
       return Result.fromError({
-        message: 'Speedrun-Group to delete was not found',
+        message: 'Speedrun group to delete was not found',
         status: 404,
       });
     }
     try {
       await this.speedrunGroupRepository.remove(speedrunCategoryToRemove);
       return Result.fromResult({
-        message: 'Speedrun-Group succesfully removed',
+        message: 'Speedrun group succesfully removed',
       });
     } catch (e) {
       return Result.fromError({
-        message: 'Speedrun-Group could not be removed',
+        message: 'Speedrun group could not be removed',
         status: 400,
         innerError: e,
       });

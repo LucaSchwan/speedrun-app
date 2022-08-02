@@ -14,30 +14,35 @@ export default class SpeedrunTypesController {
       route: '/speedrun-types',
       controller: SpeedrunTypesController,
       action: 'all',
+      auth: 'none',
     },
     {
       method: 'get',
       route: '/speedrun-types/:id',
       controller: SpeedrunTypesController,
       action: 'one',
+      auth: 'none',
     },
     {
       method: 'post',
       route: '/speedrun-types',
       controller: SpeedrunTypesController,
       action: 'create',
+      auth: 'session',
     },
     {
       method: 'put',
       route: '/speedrun-types/:id',
       controller: SpeedrunTypesController,
       action: 'update',
+      auth: 'session',
     },
     {
       method: 'delete',
       route: '/speedrun-types/:id',
       controller: SpeedrunTypesController,
       action: 'remove',
+      auth: 'session',
     },
   ];
 
@@ -56,7 +61,7 @@ export default class SpeedrunTypesController {
     });
     return types == null
       ? Result.fromError({
-          message: 'Error getting Speedrun-Types',
+          message: 'Error getting speedrun types',
           status: 404,
         })
       : Result.fromResult(types);
@@ -76,7 +81,7 @@ export default class SpeedrunTypesController {
     });
     return type == null
       ? Result.fromError({
-          message: 'Speedrun-Type not found',
+          message: 'Speedrun type not found',
           status: 404,
         })
       : Result.fromResult(type);
@@ -95,7 +100,7 @@ export default class SpeedrunTypesController {
 
     if (group == null) {
       return Result.fromError({
-        message: "The Speedrun-Group doesn't exist",
+        message: "The Speedrun group doesn't exist",
         status: 400,
       });
     }
@@ -110,7 +115,7 @@ export default class SpeedrunTypesController {
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
-        message: 'Error creating Speedrun-Group',
+        message: 'Error creating speedrun group',
         status: 400,
         innerError: e,
       });
@@ -129,7 +134,7 @@ export default class SpeedrunTypesController {
     });
     if (type == null) {
       return Result.fromError({
-        message: 'Speedrun-Type to update not found',
+        message: 'Speedrun type to update not found',
         status: 404,
       });
     }
@@ -150,7 +155,7 @@ export default class SpeedrunTypesController {
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
-        message: 'Error updating Speedrun-Type',
+        message: 'Error updating speedrung type',
         status: 400,
         innerError: e,
       });
@@ -168,18 +173,18 @@ export default class SpeedrunTypesController {
     });
     if (typeToRemove == null) {
       return Result.fromError({
-        message: 'Speedrun-Type to delete was not found',
+        message: 'Speedrun type to delete was not found',
         status: 404,
       });
     }
     try {
       await this.speedrunTypeRepository.remove(typeToRemove);
       return Result.fromResult({
-        message: 'Speedrun-Type succesfully removed',
+        message: 'Speedrun type succesfully removed',
       });
     } catch (e) {
       return Result.fromError({
-        message: 'Speedrun-Type could not be removed',
+        message: 'Speedrun type could not be removed',
         status: 400,
         innerError: e,
       });

@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+import UserRole from './UserRole';
 
 @Entity({ name: 'users' })
 export default class User {
@@ -13,4 +20,8 @@ export default class User {
 
   @Column()
   passwordHash: string;
+
+  @ManyToMany(() => UserRole)
+  @JoinTable()
+  roles: UserRole[];
 }

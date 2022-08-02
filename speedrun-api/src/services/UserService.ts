@@ -1,11 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as bcrypt from 'bcrypt';
 import { AppDataSource } from '../data-source';
 import User from '../entities/user/User';
-import Result from '../helper/Result';
+import UserRole from '../entities/user/UserRole';
+import Result, { Message } from '../helper/Result';
+import UserRoleService from './UserRoleService';
 
 export default class UserService {
   private userRepository = AppDataSource.getRepository(User);
+
+  private userRoleRepository = AppDataSource.getRepository(UserRole);
+
+  private userRoleService = new UserRoleService();
 
   async createUser(
     email: string,
@@ -77,7 +82,7 @@ export default class UserService {
     }
   }
 
-  async removeUser(id: number): Promise<Result<any>> {
+  async removeUser(id: number): Promise<Result<Message>> {
     const userToRemove = await this.userRepository.findOneBy({
       id: Number(id),
     });
@@ -93,6 +98,37 @@ export default class UserService {
     } catch (e) {
       return Result.fromError({
         message: 'User could not be removed',
+        status: 400,
+        innerError: e,
+      });
+    }
+  }
+
+  async addRole(id: number, role: UserRole): Promise<Result<Message>> {
+    const user = await this.userRepository.findOneBy({
+      id: Number(id),
+    });
+    if (user == null) {
+      return Result.fromError({
+        message: 'User not found',
+        status: 404,
+      });
+    }
+
+    const roleMaybe = await this.userRoleService.getUserRole(role.id);
+    if (roleMaybe.error) {
+      return Result.fromError(roleMaybe.error);
+    }
+
+    if (!user.roles) user.roles = [];
+    user.roles.push(roleMaybe.result);
+
+    try {
+      await this.userRepository.save(user);
+      return Result.fromResult({ message: 'Role added' });
+    } catch (e) {
+      return Result.fromError({
+        message: 'Error adding role to user',
         status: 400,
         innerError: e,
       });

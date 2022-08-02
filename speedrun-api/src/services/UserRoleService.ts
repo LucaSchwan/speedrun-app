@@ -1,4 +1,6 @@
+import { FindOptionsWhere } from 'typeorm';
 import { AppDataSource } from '../data-source';
+import User from '../entities/user/User';
 import UserRole from '../entities/user/UserRole';
 import Result, { Message } from '../helper/Result';
 
@@ -12,7 +14,7 @@ export default class UserRoleService {
     const userRole = await this.userRoleRepository.findOneBy(where);
     if (userRole == null) {
       return Result.fromError({
-        message: 'User-Role was not found',
+        message: 'User role was not found',
         status: 404,
       });
     }
@@ -28,7 +30,7 @@ export default class UserRoleService {
     });
     if (userRoleMaybe != null)
       return Result.fromError({
-        message: 'User-Role already exists',
+        message: 'User role already exists',
         status: 409,
       });
 
@@ -41,7 +43,7 @@ export default class UserRoleService {
       return Result.fromResult(userRole);
     } catch (e) {
       return Result.fromError({
-        message: 'Error creating User-Role',
+        message: 'Error creating user role',
         status: 400,
         innerError: e,
       });
@@ -58,7 +60,7 @@ export default class UserRoleService {
     });
     if (userRole == null) {
       return Result.fromError({
-        message: 'User-Role to update not found',
+        message: 'User role to update not found',
         status: 404,
       });
     }
@@ -71,7 +73,7 @@ export default class UserRoleService {
       return Result.fromResult(result);
     } catch (e) {
       return Result.fromError({
-        message: 'Error updating User-Role',
+        message: 'Error updating user role',
         status: 400,
         innerError: e,
       });
@@ -84,19 +86,47 @@ export default class UserRoleService {
     });
     if (userRoleToRemove == null) {
       return Result.fromError({
-        message: 'User-Role to delete was not found',
+        message: 'User role to delete was not found',
         status: 404,
       });
     }
     try {
       await this.userRoleRepository.remove(userRoleToRemove);
-      return Result.fromResult({ message: 'User-Role succesfully removed' });
+      return Result.fromResult({ message: 'User role succesfully removed' });
     } catch (e) {
       return Result.fromError({
-        message: 'User-Role could not be removed',
+        message: 'User role could not be removed',
         status: 400,
         innerError: e,
       });
     }
+  }
+
+  async userHasRole(
+    user: User,
+    role: string | number
+  ): Promise<Result<Message>> {
+    const userRole = await this.userRoleRepository.findOneBy([
+      {
+        id: role as number,
+      },
+      {
+        name: role as string,
+      },
+    ]);
+
+    if (userRole == null) {
+      return Result.fromError({
+        message: 'User role not found',
+        status: 404,
+      });
+    }
+
+    return user.roles.includes(userRole)
+      ? Result.fromResult({ message: 'User has the role' })
+      : Result.fromError({
+          message: 'User does not have the role',
+          status: 401,
+        });
   }
 }
