@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { AppDataSource } from '../../data-source';
 import User from '../../entities/user/User';
-import Result from '../../helper/Result';
+import Result, { Message } from '../../helper/Result';
 import Route from '../../helper/Route';
 import UserService from '../../services/UserService';
 import UserSession from '../../entities/user/UserSession';
@@ -43,7 +43,7 @@ export default class LoginController {
     response: Response,
     next: NextFunction,
     session: UserSession
-  ): Promise<Result<UserSession[]>> {
+  ): Promise<Result<UserSession>> {
     if (session != null) {
       return Result.fromError({
         message: 'User is already logged in',
@@ -85,7 +85,7 @@ export default class LoginController {
     response: Response,
     next: NextFunction,
     session: UserSession
-  ): Promise<Result<any>> {
+  ): Promise<Result<Message>> {
     const sessionMaybe = await this.userSessionService.invalidateSession(
       session.id
     );

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import User from '../../entities/user/User';
 import { AppDataSource } from '../../data-source';
-import Result from '../../helper/Result';
+import Result, { Message } from '../../helper/Result';
 import Route from '../../helper/Route';
 import UserService from '../../services/UserService';
 import UserSession from '../../entities/user/UserSession';
+import UserRoleService from '../../services/UserRoleService';
 
 export default class UserController {
   public static routes: Route[] = [
@@ -54,6 +54,7 @@ export default class UserController {
     session: UserSession
   ): Promise<Result<User[]>> {
     const user = await this.userRepository.find();
+    });
     return user == null
       ? Result.fromError({
           message: 'No Users found',
@@ -118,7 +119,7 @@ export default class UserController {
     response: Response,
     next: NextFunction,
     session: UserSession
-  ): Promise<Result<any>> {
+  ): Promise<Result<Message>> {
     let id: number;
     if (request.params.id) {
       id = Number(request.params.id);

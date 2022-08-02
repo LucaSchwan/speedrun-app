@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import SpeedrunType from '../../entities/speedruns/SpeedrunType';
 import { AppDataSource } from '../../data-source';
-import Result from '../../helper/Result';
+import Result, { Message } from '../../helper/Result';
 import Route from '../../helper/Route';
 import SpeedrunGroup from '../../entities/speedruns/SpeedrunGroup';
 import UserSession from '../../entities/user/UserSession';
@@ -163,7 +162,7 @@ export default class SpeedrunTypesController {
     response: Response,
     next: NextFunction,
     session: UserSession
-  ): Promise<Result<any>> {
+  ): Promise<Result<Message>> {
     const typeToRemove = await this.speedrunTypeRepository.findOneBy({
       id: Number(request.params.id),
     });

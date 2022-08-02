@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import Speedrun from '../../entities/speedruns/Speedrun';
 import { AppDataSource } from '../../data-source';
-import Result from '../../helper/Result';
+import Result, { Message } from '../../helper/Result';
 import Route from '../../helper/Route';
 import SpeedrunType from '../../entities/speedruns/SpeedrunType';
 import User from '../../entities/user/User';
@@ -193,7 +192,7 @@ export default class SpeedrunsController {
     response: Response,
     next: NextFunction,
     session: UserSession
-  ): Promise<Result<any>> {
+  ): Promise<Result<Message>> {
     if (session == null) {
       return Result.fromError({
         message: 'You are not logged in',

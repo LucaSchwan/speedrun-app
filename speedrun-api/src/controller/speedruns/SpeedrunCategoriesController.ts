@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import SpeedrunCategory from '../../entities/speedruns/SpeedrunCategory';
 import { AppDataSource } from '../../data-source';
-import Result from '../../helper/Result';
+import Result, { Message } from '../../helper/Result';
 import Route from '../../helper/Route';
 import UserSession from '../../entities/user/UserSession';
 
@@ -129,7 +128,7 @@ export default class SpeedrunCategoriesController {
     response: Response,
     next: NextFunction,
     session: UserSession
-  ): Promise<Result<any>> {
+  ): Promise<Result<Message>> {
     const categoryToRemove = await this.speedrunCategoryRepository.findOneBy({
       id: Number(request.params.id),
     });

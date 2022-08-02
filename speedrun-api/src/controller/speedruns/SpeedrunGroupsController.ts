@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import SpeedrunGroup from '../../entities/speedruns/SpeedrunGroup';
 import { AppDataSource } from '../../data-source';
-import Result from '../../helper/Result';
+import Result, { Message } from '../../helper/Result';
 import Route from '../../helper/Route';
 import SpeedrunCategory from '../../entities/speedruns/SpeedrunCategory';
 import UserSession from '../../entities/user/UserSession';
@@ -164,7 +163,7 @@ export default class SpeedrunGroupsController {
     response: Response,
     next: NextFunction,
     session: UserSession
-  ): Promise<Result<any>> {
+  ): Promise<Result<Message>> {
     const speedrunCategoryToRemove =
       await this.speedrunGroupRepository.findOneBy({
         id: Number(request.params.id),

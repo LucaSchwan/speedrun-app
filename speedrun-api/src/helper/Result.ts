@@ -5,6 +5,10 @@ interface Error {
   innerError?: unknown;
 }
 
+export interface Message {
+  message: string;
+}
+
 export default class Result<T> {
   result: T | null;
 
