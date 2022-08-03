@@ -9,8 +9,11 @@ export default class UserSessionService {
   private userRepository = AppDataSource.getRepository(User);
 
   public async getSession(sessionId: number): Promise<Result<UserSession>> {
-    const session = await this.userSessionRepository.findOneBy({
-      id: sessionId,
+    const session = await this.userSessionRepository.findOne({
+      where: {
+        id: sessionId,
+      },
+      relations: ['user', 'user.roles'],
     });
 
     if (session == null) {
@@ -77,9 +80,12 @@ export default class UserSessionService {
   public async validateSession(
     session: UserSession
   ): Promise<Result<UserSession>> {
-    const userSession = await this.userSessionRepository.findOneBy({
-      id: session.id,
-      user: session.user,
+    const userSession = await this.userSessionRepository.findOne({
+      where: {
+        id: session.id,
+        user: session.user,
+      },
+      relations: ['user', 'user.roles'],
     });
 
     if (userSession == null) {

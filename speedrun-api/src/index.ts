@@ -51,9 +51,11 @@ AppDataSource.initialize()
 
             const adminRole = await userRoleService.getUserRole(null, 'admin');
             if (route.auth === 'admin') {
-              const userRoles = validatingResult.result.user?.roles ?? null;
-              console.log(userRoles);
-              if (userRoles == null || !userRoles?.includes(adminRole.result)) {
+              const userRoles = validatingResult.result.user?.roles;
+              if (
+                userRoles == null ||
+                !userRoles.some((role) => role.id === adminRole.result.id)
+              ) {
                 res.status(403).json({
                   message: 'You are not authorized to perform this action',
                 });
@@ -65,7 +67,7 @@ AppDataSource.initialize()
             res.status(401).json({ message: 'Session is required' });
             return;
           } else if (route.auth === 'admin') {
-            res.status(403).json({
+            res.status(401).json({
               message: 'You are not authorized to perform this action',
             });
             return;
