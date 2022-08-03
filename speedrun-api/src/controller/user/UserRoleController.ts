@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
+import { FindOptionsWhere } from 'typeorm';
 import { AppDataSource } from '../../data-source';
 import UserRole from '../../entities/user/UserRole';
 import UserSession from '../../entities/user/UserSession';
@@ -56,7 +57,11 @@ export default class UserRoleController {
     next: NextFunction,
     session: UserSession
   ): Promise<Result<UserRole[]>> {
-    const userRoles = await this.userRoleRepository.find();
+    const { name, description } = request.query;
+    let where: FindOptionsWhere<UserRole>[];
+    if (name) where = [{ name: name as string }];
+    if (description) where.push({ description: description as string });
+    const userRoles = await this.userRoleRepository.find({ where });
     return userRoles == null
       ? Result.fromError({
           message: 'No user roles found',

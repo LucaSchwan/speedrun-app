@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
+import { FindOptionsWhere } from 'typeorm';
 import SpeedrunCategory from '../../entities/speedruns/SpeedrunCategory';
 import { AppDataSource } from '../../data-source';
 import Result, { Message } from '../../helper/Result';
@@ -54,7 +55,11 @@ export default class SpeedrunCategoriesController {
     next: NextFunction,
     session: UserSession
   ): Promise<Result<SpeedrunCategory[]>> {
-    const categories = await this.speedrunCategoryRepository.find();
+    const { name, description } = request.query;
+    let where: FindOptionsWhere<SpeedrunCategory>[];
+    if (name) where = [{ name: name as string }];
+    if (description) where.push({ description: description as string });
+    const categories = await this.speedrunCategoryRepository.findBy(where);
     return categories == null
       ? Result.fromError({
           message: 'Error getting speedrun categories',

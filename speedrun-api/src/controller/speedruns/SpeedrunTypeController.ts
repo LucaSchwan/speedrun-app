@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
-import SpeedrunType from '../../entities/speedruns/SpeedrunType';
+import { FindOptionsWhere } from 'typeorm';
 import { AppDataSource } from '../../data-source';
+import SpeedrunGroup from '../../entities/speedruns/SpeedrunGroup';
+import SpeedrunType from '../../entities/speedruns/SpeedrunType';
+import UserSession from '../../entities/user/UserSession';
 import Result, { Message } from '../../helper/Result';
 import Route from '../../helper/Route';
-import SpeedrunGroup from '../../entities/speedruns/SpeedrunGroup';
-import UserSession from '../../entities/user/UserSession';
 
 export default class SpeedrunTypesController {
   public static routes: Route[] = [
@@ -56,7 +57,12 @@ export default class SpeedrunTypesController {
     next: NextFunction,
     session: UserSession
   ): Promise<Result<SpeedrunType[]>> {
+    const { name, description } = request.query;
+    let where: FindOptionsWhere<SpeedrunType>[];
+    if (name) where = [{ name: name as string }];
+    if (description) where.push({ description: description as string });
     const types = await this.speedrunTypeRepository.find({
+      where,
       relations: ['group'],
     });
     return types == null

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
-import * as bcrypt from 'bcrypt';
-import User from '../../entities/user/User';
+import { FindOptionsWhere } from 'typeorm';
 import { AppDataSource } from '../../data-source';
+import User from '../../entities/user/User';
+import UserSession from '../../entities/user/UserSession';
 import Result, { Message } from '../../helper/Result';
 import Route from '../../helper/Route';
-import UserService from '../../services/UserService';
-import UserSession from '../../entities/user/UserSession';
 import UserRoleService from '../../services/UserRoleService';
+import UserService from '../../services/UserService';
 
 export default class UserController {
   public static routes: Route[] = [
@@ -67,7 +67,11 @@ export default class UserController {
     next: NextFunction,
     session: UserSession
   ): Promise<Result<User[]>> {
+    const { name } = request.query;
+    let where: FindOptionsWhere<User>[];
+    if (name) where = [{ name: name as string }];
     const user = await this.userRepository.find({
+      where,
       relations: ['roles'],
     });
     return user == null

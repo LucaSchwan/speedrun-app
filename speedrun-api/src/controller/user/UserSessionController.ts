@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
-import UserSesssion from '../../entities/user/UserSession';
+import { FindOptionsWhere } from 'typeorm';
 import { AppDataSource } from '../../data-source';
+import User from '../../entities/user/User';
+import UserSession from '../../entities/user/UserSession';
 import Result from '../../helper/Result';
 import Route from '../../helper/Route';
 
@@ -12,27 +14,42 @@ export default class UserSessionController {
       route: '/sessions',
       controller: UserSessionController,
       action: 'all',
-      auth: 'none',
+      auth: 'admin',
     },
     {
       method: 'get',
       route: '/sessions/:id',
       controller: UserSessionController,
       action: 'one',
-      auth: 'none',
+      auth: 'admin',
     },
   ];
 
-  private UserSessionRepository = AppDataSource.getRepository(UserSesssion);
+  private userSessionRepository = AppDataSource.getRepository(UserSession);
+
+  private userRepository = AppDataSource.getRepository(User);
 
   async all(
     request: Request,
     response: Response,
     next: NextFunction,
-    session: UserSesssion
-  ): Promise<Result<UserSesssion[]>> {
-    // should be admin to get other users sessions
-    const userSessions = await this.UserSessionRepository.find({
+    session: UserSession
+  ): Promise<Result<UserSession[]>> {
+    const { userId } = request.query;
+    let where: FindOptionsWhere<UserSession>[];
+    if (userId) {
+      const user = await this.userRepository.findOneBy({
+        id: Number(userId),
+      });
+      if (user == null) {
+        return Result.fromError({
+          message: 'User not found',
+          status: 404,
+        });
+      }
+      where = [{ user }];
+    }
+    const userSessions = await this.userSessionRepository.find({
       relations: ['user'],
     });
     return userSessions == null
@@ -47,10 +64,10 @@ export default class UserSessionController {
     request: Request,
     response: Response,
     next: NextFunction,
-    session: UserSesssion
-  ): Promise<Result<UserSesssion>> {
+    session: UserSession
+  ): Promise<Result<UserSession>> {
     // should be admin to get other users sessions
-    const userSessions = await this.UserSessionRepository.findOne({
+    const userSessions = await this.userSessionRepository.findOne({
       where: {
         id: Number(request.params.id),
       },

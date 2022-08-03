@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
-import Speedrun from '../../entities/speedruns/Speedrun';
+import { FindOptionsWhere } from 'typeorm';
 import { AppDataSource } from '../../data-source';
-import Result, { Message } from '../../helper/Result';
-import Route from '../../helper/Route';
+import Speedrun from '../../entities/speedruns/Speedrun';
 import SpeedrunType from '../../entities/speedruns/SpeedrunType';
 import User from '../../entities/user/User';
 import UserSession from '../../entities/user/UserSession';
+import Result, { Message } from '../../helper/Result';
+import Route from '../../helper/Route';
 
 export default class SpeedrunsController {
   public static routes: Route[] = [
@@ -51,7 +52,7 @@ export default class SpeedrunsController {
 
   private speedrunTypeRepository = AppDataSource.getRepository(SpeedrunType);
 
-  private userTypeRepository = AppDataSource.getRepository(User);
+  private userRepository = AppDataSource.getRepository(User);
 
   async all(
     request: Request,
@@ -59,7 +60,22 @@ export default class SpeedrunsController {
     next: NextFunction,
     session: UserSession
   ): Promise<Result<Speedrun[]>> {
+    const { userId } = request.query;
+    let where: FindOptionsWhere<Speedrun>[];
+    if (userId) {
+      const user = await this.userRepository.findOneBy({
+        id: Number(userId),
+      });
+      if (user == null) {
+        return Result.fromError({
+          message: 'User not found',
+          status: 404,
+        });
+      }
+      where = [{ user }];
+    }
     const speedruns = await this.speedrunRepository.find({
+      where,
       relations: ['type'],
     });
     return speedruns == null
